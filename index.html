@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ソリューション2">
+<meta name="theme-color" content="#0f1620">
+<meta name="robots" content="noindex,nofollow">
+<title>レベル別英語長文ソリューション2 ハイレベル ｜ オアシス</title>
+<style>
+  :root {
+    --bg: #0f1620;
+    --panel: #1a2332;
+    --panel-2: #243042;
+    --accent: #4cc2ff;
+    --accent-2: #7be0d3;
+    --text: #e8eef7;
+    --text-dim: #8ea0b8;
+    --warn: #ffc857;
+    --border: #2c3a52;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body { padding-bottom: max(180px, env(safe-area-inset-bottom)); }
+
+  header {
+    padding: 14px 16px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    background: linear-gradient(135deg, #1a2332 0%, #243042 100%);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { font-size: 15px; font-weight: 600; line-height: 1.4; }
+  header .sub { margin-top: 3px; font-size: 11px; color: var(--text-dim); }
+
+  .now-playing { text-align: center; padding: 18px 16px 10px; }
+  .now-playing .label {
+    font-size: 10px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .now-playing .title {
+    font-size: 22px; font-weight: 700; margin-top: 4px;
+    color: var(--accent);
+  }
+  .now-playing .status { font-size: 11px; color: var(--text-dim); margin-top: 6px; min-height: 14px; }
+
+  .tracks { padding: 8px 12px; }
+  .tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .tcard {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .tcard:active { transform: scale(0.96); }
+  .tcard.active {
+    background: var(--accent);
+    color: #0a1622;
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(76, 194, 255, 0.4);
+  }
+  .tcard .num { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tcard .lbl { font-size: 10px; margin-top: 2px; color: var(--text-dim); }
+  .tcard.active .lbl { color: rgba(10,22,34,0.7); }
+
+  .panels { padding: 0 14px; }
+  .panel {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+  }
+  .panel h3 {
+    font-size: 11px; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .speed-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .speed-btn {
+    flex: 1 1 calc(25% - 6px);
+    min-height: 38px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    font-family: inherit;
+    touch-action: manipulation;
+  }
+  .speed-btn.active {
+    background: var(--accent); color: #0a1622;
+    border-color: var(--accent); font-weight: 600;
+  }
+  .speed-display {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 18px; font-weight: 700;
+    color: var(--accent); font-variant-numeric: tabular-nums;
+  }
+
+  .ab-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ab-row .btn {
+    flex: 1 1 0; min-width: 0;
+    min-height: 42px;
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  .ab-info { width: 100%; text-align: center; font-size: 12px; color: var(--text-dim); margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+  .btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all 0.15s;
+    touch-action: manipulation;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn.toggle.on {
+    background: var(--accent); color: #0a1622; border-color: var(--accent);
+  }
+  .btn.toggle.warn.on {
+    background: var(--warn); color: #2a1f00; border-color: var(--warn);
+  }
+
+  .player-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(15, 22, 32, 0.97);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: 10px 14px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    z-index: 20;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  }
+  .progress {
+    width: 100%;
+    height: 14px;
+    background: var(--panel);
+    border-radius: 7px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 7px;
+    transition: width 0.1s linear;
+  }
+  .ab-marker {
+    position: absolute; top: 0; height: 100%;
+    width: 3px; background: var(--warn); z-index: 2;
+  }
+  .ab-region {
+    position: absolute; top: 0; height: 100%;
+    background: rgba(255, 200, 87, 0.3); z-index: 1;
+  }
+  .time {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-dim);
+    margin: 4px 0 8px; font-variant-numeric: tabular-nums;
+  }
+  .controls {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+  }
+  .ctl {
+    width: 44px; height: 44px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: inherit;
+    touch-action: manipulation;
+    transition: all 0.15s;
+  }
+  .ctl:active { transform: scale(0.92); }
+  .ctl.primary {
+    width: 60px; height: 60px;
+    background: var(--accent);
+    color: #0a1622;
+    border-color: var(--accent);
+    font-size: 24px;
+  }
+
+  @media (min-width: 600px) {
+    .tracks-grid { grid-template-columns: repeat(10, 1fr); }
+    .now-playing .title { font-size: 26px; }
+    body { padding-bottom: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>大学入試 レベル別英語長文ソリューション2 ハイレベル</h1>
+  <div class="sub">英文音声プレーヤー｜オアシス</div>
+</header>
+
+<div class="now-playing">
+  <div class="label">Now Playing</div>
+  <div class="title" id="np-title">トラックを選んでください</div>
+  <div class="status" id="np-status"></div>
+</div>
+
+<div class="tracks">
+  <div class="tracks-grid" id="tracks-grid"></div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>再生速度</h3>
+    <div class="speed-row">
+      <button class="speed-btn" data-speed="0.5">0.5x</button>
+      <button class="speed-btn" data-speed="0.75">0.75x</button>
+      <button class="speed-btn" data-speed="0.85">0.85x</button>
+      <button class="speed-btn active" data-speed="1.0">1.0x</button>
+      <button class="speed-btn" data-speed="1.15">1.15x</button>
+      <button class="speed-btn" data-speed="1.25">1.25x</button>
+      <button class="speed-btn" data-speed="1.5">1.5x</button>
+      <button class="speed-btn" data-speed="2.0">2.0x</button>
+    </div>
+    <div class="speed-display" id="speed-display">1.00x</div>
+  </div>
+
+  <div class="panel">
+    <h3>区間リピート（A-B）</h3>
+    <div class="ab-row">
+      <button class="btn toggle warn" id="btn-set-a">A点</button>
+      <button class="btn toggle warn" id="btn-set-b">B点</button>
+      <button class="btn" id="btn-clear-ab">解除</button>
+      <button class="btn toggle" id="btn-loop-ab">ループ OFF</button>
+      <div class="ab-info" id="ab-info">A: -- ／ B: --</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>リピート設定</h3>
+    <div class="ab-row">
+      <button class="btn toggle" id="btn-loop-track">1曲リピート OFF</button>
+      <button class="btn toggle" id="btn-loop-all">全曲リピート OFF</button>
+      <button class="btn toggle on" id="btn-autonext">自動で次へ ON</button>
+    </div>
+  </div>
+</div>
+
+<div class="player-bar">
+  <div class="progress" id="progress">
+    <div class="ab-region" id="ab-region" style="display:none;"></div>
+    <div class="ab-marker" id="ab-a" style="display:none;"></div>
+    <div class="ab-marker" id="ab-b" style="display:none;"></div>
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <div class="time">
+    <span id="time-cur">0:00</span>
+    <span id="time-tot">0:00</span>
+  </div>
+  <div class="controls">
+    <button class="ctl" id="btn-prev-track" title="前のトラック">⏮</button>
+    <button class="ctl" id="btn-restart" title="最初から">↺</button>
+    <button class="ctl" id="btn-back5" title="5秒戻る">−5</button>
+    <button class="ctl primary" id="btn-play" title="再生/停止">▶</button>
+    <button class="ctl" id="btn-fwd5" title="5秒進む">+5</button>
+    <button class="ctl" id="btn-next" title="次のトラック">⏭</button>
+  </div>
+</div>
+
+<audio id="audio" preload="auto" crossorigin="anonymous"></audio>
+
+<script>
+// Drive直接ストリーミングURL（リンク共有公開のmp3）
+function driveUrl(id) {
+  return 'https://drive.google.com/uc?export=download&id=' + id;
+}
+var tracks = [
+  ["1Yb88UNbgVPstFagL4pRdkcJLvfUwkp0D", "第1講"],
+  ["1O5bRnhfZ6PnVeVkKiwpjBYEb9z7NIIqU", "第2講"],
+  ["1uDyZKXLRPNWCTuPREhQN8tQDyDe4OBhQ", "第3講"],
+  ["1sL3kFEPbhNhRSwwg638YAZ6vNcEtMu6D", "第4講"],
+  ["1K_eU9i1W5Vhw75LVcsb3UfkMaOZtJVoB", "第5講"],
+  ["16TCT-LEjVr0tXwVIIj-HL4SQYEvVS8g6", "第6講"],
+  ["1UjYQ9WYgmtw-o5zdVSBakGHgM_i49qvq", "第7講"],
+  ["16i-MYc5QsOMu7RR_eaw95aomvYw6WVBe", "第8講"],
+  ["1l_0BdzySnLxBNIZjggnkNSt1SsW7QtTd", "第9講"],
+  ["1ARZCtuDg5MzUGBHLtQHZtYW9NAygn-zx", "第10講"]
+];
+
+var audio = document.getElementById('audio');
+var gridEl = document.getElementById('tracks-grid');
+var npTitle = document.getElementById('np-title');
+var npStatus = document.getElementById('np-status');
+var progress = document.getElementById('progress');
+var progressBar = document.getElementById('progress-bar');
+var timeCur = document.getElementById('time-cur');
+var timeTot = document.getElementById('time-tot');
+var btnPlay = document.getElementById('btn-play');
+var btnPrevTrack = document.getElementById('btn-prev-track');
+var btnRestart = document.getElementById('btn-restart');
+var btnNext = document.getElementById('btn-next');
+var btnBack5 = document.getElementById('btn-back5');
+var btnFwd5 = document.getElementById('btn-fwd5');
+var speedDisplay = document.getElementById('speed-display');
+var btnSetA = document.getElementById('btn-set-a');
+var btnSetB = document.getElementById('btn-set-b');
+var btnClearAB = document.getElementById('btn-clear-ab');
+var btnLoopAB = document.getElementById('btn-loop-ab');
+var btnLoopTrack = document.getElementById('btn-loop-track');
+var btnLoopAll = document.getElementById('btn-loop-all');
+var btnAutonext = document.getElementById('btn-autonext');
+var abInfo = document.getElementById('ab-info');
+var abRegion = document.getElementById('ab-region');
+var abAEl = document.getElementById('ab-a');
+var abBEl = document.getElementById('ab-b');
+
+var currentIdx = -1;
+var pointA = null, pointB = null;
+var loopAB = false, loopTrack = false, loopAll = false, autonext = true;
+
+function fmt(t) {
+  if (!isFinite(t) || t == null) return '0:00';
+  var m = Math.floor(t / 60);
+  var s = Math.floor(t % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function makeCard(t, i) {
+  var card = document.createElement('div');
+  card.className = 'tcard';
+  var num = document.createElement('div');
+  num.className = 'num';
+  num.textContent = (i + 1);
+  var lbl = document.createElement('div');
+  lbl.className = 'lbl';
+  lbl.textContent = '講';
+  card.appendChild(num);
+  card.appendChild(lbl);
+  card.addEventListener('click', function () { loadTrack(i, true); });
+  return card;
+}
+
+function renderTracks() {
+  while (gridEl.firstChild) gridEl.removeChild(gridEl.firstChild);
+  for (var i = 0; i < tracks.length; i++) {
+    var c = makeCard(tracks[i], i);
+    if (i === currentIdx) c.classList.add('active');
+    gridEl.appendChild(c);
+  }
+}
+
+function loadTrack(idx, autoplay) {
+  if (idx < 0 || idx >= tracks.length) return;
+  currentIdx = idx;
+  var fileId = tracks[idx][0];
+  var name = tracks[idx][1];
+  npTitle.textContent = name;
+  document.title = '▶ ' + name + ' ｜ ソリューション2';
+  resetAB();
+  renderTracks();
+  npStatus.textContent = '読み込み中…';
+  audio.src = driveUrl(fileId);
+  if (autoplay) audio.play().catch(function () {});
+}
+
+function togglePlay() {
+  if (currentIdx < 0) { loadTrack(0, true); return; }
+  if (audio.paused) audio.play().catch(function () {});
+  else audio.pause();
+}
+
+audio.addEventListener('canplay', function () { npStatus.textContent = ''; });
+audio.addEventListener('error', function () {
+  npStatus.textContent = '読み込み失敗（ネットワークまたはDrive権限を確認してください）';
+});
+audio.addEventListener('play', function () { btnPlay.textContent = '⏸'; });
+audio.addEventListener('pause', function () { btnPlay.textContent = '▶'; });
+audio.addEventListener('loadedmetadata', function () {
+  timeTot.textContent = fmt(audio.duration);
+});
+audio.addEventListener('timeupdate', function () {
+  var pct = (audio.currentTime / audio.duration) * 100;
+  progressBar.style.width = (pct || 0) + '%';
+  timeCur.textContent = fmt(audio.currentTime);
+  if (loopAB && pointA != null && pointB != null && audio.currentTime >= pointB) {
+    audio.currentTime = pointA;
+  }
+});
+audio.addEventListener('ended', function () {
+  if (loopTrack) { audio.currentTime = 0; audio.play().catch(function () {}); return; }
+  if (autonext) {
+    if (currentIdx < tracks.length - 1) loadTrack(currentIdx + 1, true);
+    else if (loopAll) loadTrack(0, true);
+  }
+});
+
+progress.addEventListener('click', function (e) {
+  var rect = progress.getBoundingClientRect();
+  var pct = (e.clientX - rect.left) / rect.width;
+  if (audio.duration) audio.currentTime = pct * audio.duration;
+});
+
+btnPlay.addEventListener('click', togglePlay);
+btnPrevTrack.addEventListener('click', function () {
+  if (currentIdx > 0) loadTrack(currentIdx - 1, true);
+  else if (currentIdx === 0) audio.currentTime = 0;
+});
+btnRestart.addEventListener('click', function () {
+  if (currentIdx < 0) { loadTrack(0, true); return; }
+  audio.currentTime = 0;
+  audio.play().catch(function () {});
+});
+btnNext.addEventListener('click', function () {
+  if (currentIdx < tracks.length - 1) loadTrack(currentIdx + 1, true);
+});
+btnBack5.addEventListener('click', function () {
+  audio.currentTime = Math.max(0, audio.currentTime - 5);
+});
+btnFwd5.addEventListener('click', function () {
+  audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+});
+
+var speedBtns = document.querySelectorAll('.speed-btn');
+for (var i = 0; i < speedBtns.length; i++) {
+  (function (btn) {
+    btn.addEventListener('click', function () {
+      setSpeed(parseFloat(btn.getAttribute('data-speed')));
+    });
+  })(speedBtns[i]);
+}
+
+function setSpeed(s) {
+  audio.playbackRate = s;
+  speedDisplay.textContent = s.toFixed(2) + 'x';
+  for (var i = 0; i < speedBtns.length; i++) {
+    var v = parseFloat(speedBtns[i].getAttribute('data-speed'));
+    speedBtns[i].classList.toggle('active', Math.abs(v - s) < 0.001);
+  }
+}
+
+function updateABDisplay() {
+  if (pointA != null && audio.duration) {
+    abAEl.style.display = 'block';
+    abAEl.style.left = ((pointA / audio.duration) * 100) + '%';
+  } else { abAEl.style.display = 'none'; }
+  if (pointB != null && audio.duration) {
+    abBEl.style.display = 'block';
+    abBEl.style.left = ((pointB / audio.duration) * 100) + '%';
+  } else { abBEl.style.display = 'none'; }
+  if (pointA != null && pointB != null && audio.duration) {
+    abRegion.style.display = 'block';
+    abRegion.style.left = ((pointA / audio.duration) * 100) + '%';
+    abRegion.style.width = (((pointB - pointA) / audio.duration) * 100) + '%';
+  } else { abRegion.style.display = 'none'; }
+  abInfo.textContent = 'A: ' + (pointA != null ? fmt(pointA) : '--') + ' ／ B: ' + (pointB != null ? fmt(pointB) : '--');
+}
+
+function resetAB() {
+  pointA = null; pointB = null; loopAB = false;
+  btnLoopAB.classList.remove('on');
+  btnLoopAB.textContent = 'ループ OFF';
+  btnSetA.classList.remove('on');
+  btnSetB.classList.remove('on');
+  updateABDisplay();
+}
+
+btnSetA.addEventListener('click', function () {
+  pointA = audio.currentTime;
+  if (pointB != null && pointA >= pointB) pointB = null;
+  btnSetA.classList.add('on');
+  if (pointB == null) btnSetB.classList.remove('on');
+  updateABDisplay();
+});
+btnSetB.addEventListener('click', function () {
+  if (pointA == null) { alert('先にA点をセットしてください'); return; }
+  if (audio.currentTime <= pointA) { alert('B点はA点より後でセットしてください'); return; }
+  pointB = audio.currentTime;
+  btnSetB.classList.add('on');
+  updateABDisplay();
+});
+btnClearAB.addEventListener('click', resetAB);
+btnLoopAB.addEventListener('click', function () {
+  if (pointA == null || pointB == null) { alert('A点とB点をセットしてください'); return; }
+  loopAB = !loopAB;
+  btnLoopAB.classList.toggle('on', loopAB);
+  btnLoopAB.textContent = loopAB ? 'ループ ON' : 'ループ OFF';
+});
+
+btnLoopTrack.addEventListener('click', function () {
+  loopTrack = !loopTrack;
+  btnLoopTrack.classList.toggle('on', loopTrack);
+  btnLoopTrack.textContent = loopTrack ? '1曲リピート ON' : '1曲リピート OFF';
+});
+btnLoopAll.addEventListener('click', function () {
+  loopAll = !loopAll;
+  btnLoopAll.classList.toggle('on', loopAll);
+  btnLoopAll.textContent = loopAll ? '全曲リピート ON' : '全曲リピート OFF';
+});
+btnAutonext.addEventListener('click', function () {
+  autonext = !autonext;
+  btnAutonext.classList.toggle('on', autonext);
+  btnAutonext.textContent = autonext ? '自動で次へ ON' : '自動で次へ OFF';
+});
+
+document.addEventListener('keydown', function (e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.code) {
+    case 'Space': e.preventDefault(); togglePlay(); break;
+    case 'ArrowLeft':
+      e.preventDefault();
+      if (e.shiftKey) { if (currentIdx > 0) loadTrack(currentIdx - 1, true); }
+      else audio.currentTime = Math.max(0, audio.currentTime - 5);
+      break;
+    case 'ArrowRight':
+      e.preventDefault();
+      if (e.shiftKey) { if (currentIdx < tracks.length - 1) loadTrack(currentIdx + 1, true); }
+      else audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 5);
+      break;
+    case 'ArrowUp': e.preventDefault(); audio.volume = Math.min(1, audio.volume + 0.05); break;
+    case 'ArrowDown': e.preventDefault(); audio.volume = Math.max(0, audio.volume - 0.05); break;
+    case 'KeyA': btnSetA.click(); break;
+    case 'KeyB': btnSetB.click(); break;
+    case 'KeyL': btnLoopAB.click(); break;
+    case 'KeyR': btnLoopTrack.click(); break;
+    case 'KeyS': btnRestart.click(); break;
+    case 'Minus': setSpeed(Math.max(0.5, audio.playbackRate - 0.05)); break;
+    case 'Equal': setSpeed(Math.min(2.0, audio.playbackRate + 0.05)); break;
+  }
+  if (e.code.indexOf('Digit') === 0) {
+    var n = parseInt(e.code.replace('Digit', ''), 10);
+    if (n >= 1 && n <= 9 && n <= tracks.length) loadTrack(n - 1, true);
+    if (e.code === 'Digit0' && tracks.length >= 10) loadTrack(9, true);
+  }
+});
+
+renderTracks();
+setSpeed(1.0);
+</script>
+</body>
+</html>
